@@ -1,10 +1,10 @@
-name: CI/CD Demo
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
-      - develop
-      - main
+      - develop     # staging branch
+      - main        # production branch
 
 jobs:
   build:
@@ -13,24 +13,42 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Fake Build Step
-        run: echo "Building project..."
+      - name: Fake Build Step (replace with real build later)
+        run: echo "🔨 Building project..."
 
-      - name: Fake Test Step
-        run: echo "Running tests... ✅"
+      - name: Fake Test Step (replace with real tests later)
+        run: echo "✅ Running tests... all good!"
 
   deploy-staging:
     if: github.ref == 'refs/heads/develop'
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to Staging (placeholder)
-        run: echo "Deploying to STAGING server..."
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Deploy to Staging via cPanel
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.CPANEL_SERVER }}
+          username: ${{ secrets.CPANEL_USER }}
+          password: ${{ secrets.CPANEL_PASS }}
+          local-dir: ./dist   # <-- change to your project build folder
+          server-dir: /home/youruser/staging_app/   # <-- change to staging folder on cPanel
 
   deploy-production:
     if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to Production (placeholder)
-        run: echo "Deploying to PRODUCTION server..."
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Deploy to Production via cPanel
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.CPANEL_SERVER }}
+          username: ${{ secrets.CPANEL_USER }}
+          password: ${{ secrets.CPANEL_PASS }}
+          local-dir: ./dist   # <-- change to your project build folder
+          server-dir: /home/youruser/production_app/   # <-- change to production folder on cPanel
