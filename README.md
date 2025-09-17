@@ -1,2 +1,2 @@
 # ci-cd-demo
-repo to test my workflow
+repository to test my workflow
