@@ -1,10 +1,10 @@
-name: CI/CD Pipeline
+ name: CI/CD Pipeline
 
 on:
   push:
     branches:
-      - develop     # staging branch
-      - main        # production branch
+      - develop   # staging branch
+      - main      # production branch
 
 jobs:
   build:
@@ -13,45 +13,41 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Build Step
-        run: echo "⚡ No build step needed"
+      - name: Fake Build Step
+        run: echo "🔨 Building project..."
 
-      - name: Test Step
-        run: echo "✅ No tests yet"
+      - name: Fake Test Step
+        run: echo "✅ Running tests..."
 
   deploy-staging:
     if: github.ref == 'refs/heads/develop'
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Deploy to Staging via SFTP
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+      - name: Deploy to Staging via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: ${{ secrets.CPANEL_SERVER }}
-          username: ${{ secrets.CPANEL_USERNAME }}
-          password: ${{ secrets.CPANEL_PASSWORD }}
-          local_path: ./*
-          remote_path: /public_html/staging/   # change if needed
-          port: 22
+          server: ${{ secrets.CPANEL_SERVER }}      # e.g. ftp.okanologistics.com
+          username: ${{ secrets.CPANEL_USERNAME }}  # e.g. deploynew@okanologistics.com
+          password: ${{ secrets.CPANEL_PASSWORD }}  # your deploy password
+          protocol: ftp
+          port: 21
+          local-dir: ./                             # upload everything
+          server-dir: /public_html/staging/         # <-- adjust folder
 
   deploy-production:
     if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Deploy to Production via SFTP
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+      - name: Deploy to Production via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: ${{ secrets.CPANEL_SERVER }}
+          server: ${{ secrets.CPANEL_SERVER }}      # e.g. ftp.okanologistics.com
           username: ${{ secrets.CPANEL_USERNAME }}
           password: ${{ secrets.CPANEL_PASSWORD }}
-          local_path: ./*
-          remote_path: /public_html/   # default live site
-          port: 22
+          protocol: ftp
+          port: 21
+          local-dir: ./                             # upload everything
+          server-dir: /public_html/                 # main live site
 
